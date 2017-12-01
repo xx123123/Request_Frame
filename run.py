@@ -10,8 +10,8 @@ from io import StringIO
 
 if __name__ == '__main__':
 	db = mysql.DB()
-	table_name = 'cap'
-	real_sql = "select id from cap where id > 4"
+	table_name = 'rlsc'
+	real_sql = "select id from " + table_name
 	data_cases = db.query(real_sql)
 	db.close()
 	for data_case in data_cases:
