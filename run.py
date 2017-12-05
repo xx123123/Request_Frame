@@ -10,8 +10,8 @@ from io import StringIO
 
 if __name__ == '__main__':
 	db = mysql.DB()
-	table_name = 'rlsc'
-	real_sql = "select id from " + table_name
+	table_name = 'cap'
+	real_sql = "select id from " + table_name 
 	data_cases = db.query(real_sql)
 	db.close()
 	for data_case in data_cases:
@@ -33,6 +33,7 @@ if __name__ == '__main__':
 					if actual['response']['error'] == expect['error']:
 						print('url: %s' %(url))
 						print('param: %s' %(data))
+						print('response: %s' %(actual['response']))
 						print('success')
 					else:
 						print('url: %s' %(url))
@@ -43,6 +44,7 @@ if __name__ == '__main__':
 					if actual['response']['error'] != expect['error']:
 						print('url: %s' %(url))
 						print('param: %s' %(data))
+						print('response: %s' %(actual['response']))
 						print('success')
 					else:
 						print('url: %s' %(url))
