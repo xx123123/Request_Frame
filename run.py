@@ -12,6 +12,7 @@ if __name__ == '__main__':
 	db = mysql.DB()
 	table_name = 'cap'
 	real_sql = "select id from " + table_name 
+	print(real_sql)
 	data_cases = db.query(real_sql)
 	db.close()
 	for data_case in data_cases:
@@ -28,33 +29,21 @@ if __name__ == '__main__':
 		expect = json.loads(data_test['assert'])
 		print(data_case['id'])
 		if actual:
+			print('url: %s' %(url))
+			print('param: %s' %(data.replace("\r\n","")))
+			print('response: %s' %(actual['response']))
 			if actual['code'] == expect['code']:
 				if data_test['case_type']:
 					if actual['response']['error'] == expect['error']:
-						print('url: %s' %(url))
-						print('param: %s' %(data))
-						print('response: %s' %(actual['response']))
 						print('success')
 					else:
-						print('url: %s' %(url))
-						print('param: %s' %(data))
-						print('response: %s' %(actual['response']))
 						print('failed')
 				else:
 					if actual['response']['error'] != expect['error']:
-						print('url: %s' %(url))
-						print('param: %s' %(data))
-						print('response: %s' %(actual['response']))
 						print('success')
 					else:
-						print('url: %s' %(url))
-						print('param: %s' %(data))
-						print('response: %s' %(actual['response']))
 						print('failed')
 			else:
-				print('url: %s' %(url))
-				print('param: %s' %(data))
-				print('response: %s' %(actual['response']))
 				print('failed')
 		print("")
 	#db.close()

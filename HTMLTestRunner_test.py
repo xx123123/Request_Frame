@@ -22,6 +22,7 @@ class FramedTestCase(unittest.TestCase):
 	def Frame(testcase_klass, param=None, actualCode=None, expectCode=None, info=None):
 		testloader 	= unittest.TestLoader()
 		testnames	= testloader.getTestCaseNames(testcase_klass)
+		print(testnames)
 		suite 		= unittest.TestSuite()
 		method = param['method']
 		url = param['url'] + ":" + str(param['port']) + param['inter_url']
@@ -46,7 +47,7 @@ class FramedTestCase(unittest.TestCase):
 	
 
 class TestOne(FramedTestCase):
-	def test_Frame(self):
+	def testFrame(self):
 		print('TestOne')
 		print ('except-->' + str(self.actualCode['response']))
 		if self.param['case_type'] == 1:
