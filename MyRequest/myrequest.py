@@ -9,11 +9,11 @@ import json
 def api_request(method, url, data, headers, param_type):
 	try:
 		if method == 'post' and param_type == 'json':
-			results = requests.post(url = url, json = json.loads(data), headers = json.loads(headers))
+			results = requests.post(url = url, json = json.loads(data), headers = json.loads(headers), timeout = 10)
 		if method == 'post' and param_type == 'key-val':
-			results = requests.post(url = url, data = data)
+			results = requests.post(url = url, data = data, timeout = 10)
 		if method == 'get':
-			results = requests.get(url = url, params = data, headers = headers)
+			results = requests.get(url = url, params = data, headers = headers, timeout = 10)
 		response = results.text
 		code = results.status_code
 		ret = {}

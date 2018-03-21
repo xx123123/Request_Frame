@@ -64,8 +64,8 @@ def Suite():
 	global db
 	db = mysql.DB()
 	#global table_name
-	table_name = 'cap'
-	real_sql = "select id from " + table_name + " where id < 10"
+	table_name = 'rlbd'
+	real_sql = "select id from " + table_name
 	print(real_sql)
 	data_cases = db.query(real_sql)
 	db.close()

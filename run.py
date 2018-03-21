@@ -3,6 +3,7 @@
 import sys
 import MyDB.mysql_db as mysql
 import MyRequest.myrequest as myrequest 
+import MyLog.logger as logger
 import json
 import unittest
 from io import StringIO
@@ -10,9 +11,10 @@ from io import StringIO
 
 if __name__ == '__main__':
 	db = mysql.DB()
-	table_name = 'cap'
+	table_name = 'rlbd'
 	real_sql = "select id from " + table_name 
-	print(real_sql)
+	retLog = logger.Logger('response.log', logger.logging.DEBUG, logger.logging.DEBUG)
+	retLog.info(real_sql)
 	data_cases = db.query(real_sql)
 	db.close()
 	for data_case in data_cases:
@@ -25,25 +27,31 @@ if __name__ == '__main__':
 		data = data_test['params']
 		headers = data_test['headers']
 		param_type = data_test['param_type']
+		remark = data_test['remark']
 		actual = myrequest.api_request(method = method, url = url, data = data, headers = headers, param_type = param_type)
 		expect = json.loads(data_test['assert'])
-		print(data_case['id'])
-		if actual:
-			print('url: %s' %(url))
-			print('param: %s' %(data.replace("\r\n","")))
-			print('response: %s' %(actual['response']))
-			if actual['code'] == expect['code']:
-				if data_test['case_type']:
-					if actual['response']['error'] == expect['error']:
-						print('success')
+		retLog.info("case_id:	" + str(data_case['id']))
+		try:
+			if actual:
+				retLog.info('url:	%s' %(url))
+				retLog.info('remark:	%s' %(remark))
+				retLog.info('param:	%s' %(data.replace("\r\n","")))
+				retLog.info('response:	%s' %(actual['response']))
+				if actual['code'] == expect['code']:
+					if data_test['case_type']:
+						if actual['response']['error'] == expect['error']:
+							retLog.info('success')
+						else:
+							retLog.error('failed')
 					else:
-						print('failed')
+						if actual['response']['error'] != expect['error']:
+							retLog.info('success')
+						else:
+							retLog.error('failed')
 				else:
-					if actual['response']['error'] != expect['error']:
-						print('success')
-					else:
-						print('failed')
-			else:
-				print('failed')
-		print("")
+					retLog.error('failed')
+			#print("")
+		except Exception as e:
+			retLog.error("except: " + str(e))
+
 	#db.close()
