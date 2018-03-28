@@ -43,10 +43,10 @@ template_demo = """
         <div class="col-md-3">Description</div><div class="col-md-9">{{items['description']}}&nbsp;</div>
         <div class="col-md-3">Time</div><div class="col-md-9">{{items['nowTime']}}</div>
         <div class="col-md-12">&nbsp;</div>
-        <div class="col-md-4">&nbsp;</div><div class="col-md-4"><strong>Total</strong></div><div class="col-md-4"><strong>Failed</strong></div>
+        <div class="col-md-4">&nbsp;</div><div class="col-md-2"><strong>Total</strong></div><div class="col-md-2"><strong>Passed</strong></div><div class="col-md-2"><strong>Failed</strong></div>
 
-          <div class="col-md-4">Requests</div><div class="col-md-4">{{items['testPassed']}}</div><div class="col-md-4">{{items['testFalsed']}}</div>
-          <div class="col-md-4">Assertions</div><div class="col-md-4">{{items['assertPassed']}}</div><div class="col-md-4">{{items['assertFalsed']}}</div>
+          <div class="col-md-4">Requests</div><div class="col-md-2">{{items['testPassed'] + items['testFalsed']}}</div><div class="col-md-2">{{items['testPassed']}}</div><div class="col-md-2">{{items['testFalsed']}}</div>
+          <div class="col-md-4">Assertions</div><div class="col-md-2">{{items['assertPassed'] + items['assertFalsed']}}</div><div class="col-md-2">{{items['assertPassed']}}</div><div class="col-md-2">{{items['assertFalsed']}}</div>
 
         <div class="col-md-12">&nbsp;</div>
         <div class="col-md-6">Total run duration</div><div class="col-md-6">{{items['totalTime']}}ms</div>
@@ -133,13 +133,13 @@ def compare_data(responseExcept, responseActual):
 		if assertCase == 'status':
 			assertDict['description'] = ('status is %s' %str(responseExcept['status']))
 			assertCount += 1
-			if responseExcept['status'] == responseActual['status']:
+			if 'status' in responseActual.keys() and responseExcept['status'] == responseActual['status']:
 				retLog.info('status:		%s' %(str(responseActual['status'])))
 			else:
 				retLog.error('status:		%s' %(responseActual['status']))
 				retCompare = False
 				retTmp = False
-		if assertCase == 'time':
+		if 'status' in responseActual.keys() and assertCase == 'time':
 			assertDict['description'] = ('Response time is less than %sms' %str(responseExcept['time']))
 			assertCount += 1
 			if responseExcept['time'] > int(responseActual['time']):
@@ -150,34 +150,59 @@ def compare_data(responseExcept, responseActual):
 				retTmp = False
 		
 		if type(responseExcept[assertCase]) == type(1) and assertCase != 'status' and assertCase != 'time':
-			assertCount += 1
-			assertDict['description'] = ('test json %s' %(assertCase))
-			if str(responseExcept[assertCase]) == str(responseActual['response'][assertCase]):
-				retLog.info('%s:			%s' %(assertCase, responseActual['response'][assertCase]))
+			if assertCase in responseActual['response'].keys():
+				assertCount += 1
+				assertDict['description'] = ('test json %s' %(assertCase))
+				if str(responseExcept[assertCase]) == str(responseActual['response'][assertCase]):
+					retLog.info('%s:			%s' %(assertCase, responseActual['response'][assertCase]))
+				else:
+					retLog.error('%s:			%s' %(assertCase, responseActual['response'][assertCase]))
+					retCompare = False
+					retTmp = False
 			else:
-				retLog.error('%s:			%s' %(assertCase, responseActual['response'][assertCase]))
+				assertDict['description'] = ('error key:%s' %(assertCase))
+				retLog.error('error key:	%s' %(assertCase))
 				retCompare = False
 				retTmp = False
 		
 		if type(responseExcept[assertCase]) == type(''):
-			assertCount += 1
-			assertDict['description'] = ('test json %s' %(assertCase))
-			if responseExcept[assertCase] == responseActual['response'][assertCase]:
-				retLog.info('%s:			%s' %(assertCase, responseActual['response'][assertCase]))
-			else:
-				retLog.error('%s:			%s' %(assertCase, responseActual['response'][assertCase]))
-				retCompare = False
-				retTmp = False
-		if type(responseExcept[assertCase]) == type({}):
-			assertCount += 1
-			for key in responseExcept[assertCase]:
-				assertDict['description'] = ('test json %s %s' %(assertCase, key))
-				if responseExcept[assertCase][key] == responseActual['response'][assertCase][key]:
-					retLog.info('%s:		%s' %(key, responseActual['response'][assertCase][key]))
+			if assertCase in responseActual['response'].keys():
+				assertCount += 1
+				assertDict['description'] = ('test json %s' %(assertCase))
+				if responseExcept[assertCase] == responseActual['response'][assertCase]:
+					retLog.info('%s:			%s' %(assertCase, responseActual['response'][assertCase]))
 				else:
-					retLog.error('%s:		%s' %(key, responseActual['response'][assertCase][key]))
+					retLog.error('%s:			%s' %(assertCase, responseActual['response'][assertCase]))
 					retCompare = False
 					retTmp = False
+			else:
+				assertDict['description'] = ('error key:%s' %(assertCase))
+				retLog.error('error key:	%s' %(assertCase))
+				retCompare = False
+				retTmp = False
+
+		if type(responseExcept[assertCase]) == type({}):
+			if assertCase in responseActual['response'].keys():
+				assertCount += 1
+				for key in responseExcept[assertCase]:
+					if key in responseActual['response'][assertCase].keys():
+						assertDict['description'] = ('test json %s %s' %(assertCase, key))
+						if  responseExcept[assertCase][key] == responseActual['response'][assertCase][key]:
+							retLog.info('%s:		%s' %(key, responseActual['response'][assertCase][key]))
+						else:
+							retLog.error('%s:		%s' %(key, responseActual['response'][assertCase][key]))
+							retCompare = False
+							retTmp = False
+					else:
+						assertDict['description'] = ('error key:%s' %(key))
+						retLog.error('error key:	%s' %(key))
+						retCompare = False
+						retTmp = False
+			else:
+				assertDict['description'] = ('error key:%s' %(assertCase))
+				retLog.error('error key:	%s' %(assertCase))
+				retCompare = False
+				retTmp = False
 		if retTmp:
 			assertDict['assertPassed'] += 1
 			caseDict['casePassed'] += 1
@@ -192,6 +217,7 @@ def compare_data(responseExcept, responseActual):
 		
 #执行用例
 def execute_case(caseData):
+	retTmp = True
 	global caseDict
 	global retLen
 	global testPassed, testFalsed
@@ -226,24 +252,32 @@ def execute_case(caseData):
 			retLog.info('response:		%s' %(json.dumps(responseActual['response'])))
 			if not caseData['case_type']:
 				if responseActual['response']['error'] == 0:
+					retTmp = False
 					testFalsed += 1
 					caseDict['caseFalsed'] += 1
 					retLog.error('error:	%s' %(str(responseActual['response']['error'])))
 				else:
-					testPassed += 1
-					caseDict['casePassed'] += 1
-					retLog.info('error:		%s' %(str(responseActual['response']['error'])))
+					if compare_data(responseExcept, responseActual):
+						testPassed += 1
+						retLog.info('%s-%s sucess' %(caseData['inter_description'], remark))
+					else:
+						retTmp = False
+						testFalsed += 1
+						retLog.error('%s-%s false' %(caseData['inter_description'], remark))
 			else:
 				if compare_data(responseExcept, responseActual):
 					testPassed += 1
-					retLog.info('%s success' %(remark))
+					retLog.info('%s-%s sucess' %(caseData['inter_description'], remark))
 				else:
+					retTmp = False
 					testFalsed += 1
-					retLog.error('%s false' %(remark))
+					retLog.error('%s-%s false' %(caseData['inter_description'], remark))
 		else:
 			retLog.cri('response:	%s' %(responseActual))
 	except Exception as e:
 		retLog.cri('except:	%s' %(str(e)))
+		return False
+	return retTmp
 
 
 if __name__ == '__main__':
@@ -273,15 +307,19 @@ if __name__ == '__main__':
 	assertPassed = 0
 	assertFalsed = 0
 	#发送请求判断返回信息
+	retLog.info("-------------- Execute TestCases ---------------")
 	for dataCase in dataCases:
 		caseDict = {}
 		realSql = "select * from " + tableName + " where id = " + str(dataCase['id'])
 		db.__init__()
 		caseData = db.query(realSql)[0]
 		db.close()
-		execute_case(caseData)
+		if execute_case(caseData):
+			retLog.info("-------------- Get the result ------------ Pass")
+		else:
+			retLog.info("-------------- Get the result ------------ False")
 		templateRe['case'].append(caseDict)
-		retLog.info('	')
+		
 	retLog.info('test finished')
 	caseCount = len(dataCases)
 	nowTime = time.strftime("%Y%m%d%H%M%S", time.localtime())
