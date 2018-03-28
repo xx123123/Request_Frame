@@ -9,7 +9,7 @@ import time
 from bottle import template
 import webbrowser
 
-
+#日志模板
 template_demo = """
 <!DOCTYPE html>
 <html lang="en">
