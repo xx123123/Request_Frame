@@ -18,12 +18,13 @@ def api_request(method, url, data, headers, param_type):
 		if method == 'get':
 			results = requests.get(url = url, params = data, headers = headers, timeout = 10)
 		response = results.text.replace('false', 'False').replace('null', 'None').replace('true', 'True')
+		print(results.status_code)
 		#print(response)
 		#print(json.dumps(eval(response)))
 		#print(results.elapsed.microseconds/1000)
 		#print((time.time() - startTime) * 1000)
 		#print(len(response))
-		if response.find('error') > -1:
+		if results.status_code == 200:
 			status = results.status_code
 			ret = {}
 			ret['status'] = status

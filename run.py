@@ -248,7 +248,8 @@ def execute_case(caseData):
 	retLog.info('url:			%s' %(url))
 	retLog.info('param:			%s' %(params.replace('\r\n', '')))
 	try:
-		if 'status' in responseActual:
+		#print(type(responseActual))
+		if type(responseActual) == type({}):
 			retLog.info('response:		%s' %(json.dumps(responseActual['response'])))
 			if not caseData['case_type']:
 				if responseActual['response']['error'] == 0:
@@ -257,6 +258,7 @@ def execute_case(caseData):
 					caseDict['caseFalsed'] += 1
 					retLog.error('error:	%s' %(str(responseActual['response']['error'])))
 				else:
+					responseExcept.pop('error')
 					if compare_data(responseExcept, responseActual):
 						testPassed += 1
 						retLog.info('%s-%s sucess' %(caseData['inter_description'], remark))
@@ -288,7 +290,7 @@ if __name__ == '__main__':
 	
 	#读取数据库中用例
 	db = mysql.DB()
-	tableName = 'rlbd'
+	tableName = 'rlsb'
 	realSql = ("select id from %s"  %(tableName)) 
 	retLog = logger.Logger('response.log', logger.logging.DEBUG, logger.logging.DEBUG)
 	retLog.info(realSql)
