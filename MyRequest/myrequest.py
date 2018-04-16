@@ -18,7 +18,7 @@ def api_request(method, url, data, headers, param_type):
 		if method == 'get':
 			results = requests.get(url = url, params = data, headers = headers, timeout = 10)
 		response = results.text.replace('false', 'False').replace('null', 'None').replace('true', 'True')
-		print(results.status_code)
+		#print(results.status_code)
 		#print(response)
 		#print(json.dumps(eval(response)))
 		#print(results.elapsed.microseconds/1000)
@@ -36,4 +36,4 @@ def api_request(method, url, data, headers, param_type):
 		else:
 			return results.status_code
 	except Exception as e:
-		print(e)
+		print("MyRequest Error %d: %s" % (e.args[0], e.args[1]))

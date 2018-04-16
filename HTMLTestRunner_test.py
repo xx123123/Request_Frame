@@ -20,9 +20,13 @@ class FramedTestCase(unittest.TestCase):
 		self.info		= info
 	@staticmethod
 	def Frame(testcase_klass, param=None, actualCode=None, expectCode=None, info=None):
+		#print(testcase_klass)
+		print(dir(testcase_klass))
+		exit(0)
 		testloader 	= unittest.TestLoader()
 		testnames	= testloader.getTestCaseNames(testcase_klass)
-		print(testnames)
+		#testnames = param['inter_name']
+		print(testnames[0])
 		suite 		= unittest.TestSuite()
 		method = param['method']
 		url = param['url'] + ":" + str(param['port']) + param['inter_url']
@@ -72,6 +76,8 @@ def Suite():
 	for data_case in data_cases:
 		db.__init__()
 		data_test = db.query('select * from %s where id = %s' %(table_name, data_case['id']))[0]
+		#print(data_test)
+		#exit(0)
 		db.close()
 		suiteTest.addTest(FramedTestCase.Frame(TestOne, param=data_test))
 	#excel.release(path)

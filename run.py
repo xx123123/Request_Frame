@@ -277,7 +277,7 @@ def execute_case(caseData):
 		else:
 			retLog.cri('response:	%s' %(responseActual))
 	except Exception as e:
-		retLog.cri('except:	%s' %(str(e)))
+		retLog.cri("Except Error %d: %s" % (e.args[0], e.args[1]))
 		return False
 	return retTmp
 
